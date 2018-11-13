@@ -15,10 +15,10 @@ type Config struct {
 	LengthLimit       int64
 	LogingEnabled     string
 	MaxRedirects      int
-	SocketTimeout     time.Duration
 	TimingAllowOrigin string
 	HostName          string
-	KeepAlive         bool
+	Timeout           time.Duration
+	DisableKeepAlive  bool
 }
 
 func NewConfig() Config {
@@ -29,10 +29,10 @@ func NewConfig() Config {
 		LengthLimit:       getEnvInt64("CAMO_LENGTH_LIMIT", 5242880),
 		LogingEnabled:     getEnvStr("CAMO_LOGGING_ENABLED", "disabled"),
 		MaxRedirects:      getEnvInt("CAMO_MAX_REDIRECTS", 4),
-		SocketTimeout:     time.Duration(getEnvInt("CAMO_SOCKET_TIMEOUT", 10)) * time.Second,
 		TimingAllowOrigin: getEnvStr("CAMO_TIMING_ALLOW_ORIGIN", ""),
 		HostName:          getEnvStr("CAMO_HOSTNAME", "unknown"),
-		KeepAlive:         getEnvBool("CAMO_KEEP_ALIVE", false),
+		Timeout:           time.Duration(getEnvInt("CAMO_SOCKET_TIMEOUT", 10)) * time.Second,
+		DisableKeepAlive:  !getEnvBool("CAMO_KEEP_ALIVE", false),
 	}
 }
 
