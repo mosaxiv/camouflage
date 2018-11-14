@@ -1,6 +1,8 @@
 package config
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
@@ -69,15 +71,6 @@ var defaultMimeTypes = []string{
 }
 
 func NewConfig() Config {
-	//var mimeTypes []string
-	//bytes, err := ioutil.ReadFile("mime-types.json")
-	//if err != nil {
-	//	log.Fatalf(err.Error())
-	//}
-	//if err := json.Unmarshal(bytes, &mimeTypes); err != nil {
-	//	log.Fatalf(err.Error())
-	//}
-
 	return Config{
 		Port:              getEnvStr("PORT", "8081"),
 		SharedKey:         getEnvStr("CAMO_KEY", "0x24FEEDFACEDEADBEEFCAFE"),
@@ -89,8 +82,24 @@ func NewConfig() Config {
 		HostName:          getEnvStr("CAMO_HOSTNAME", "unknown"),
 		Timeout:           time.Duration(getEnvInt("CAMO_SOCKET_TIMEOUT", 10)) * time.Second,
 		DisableKeepAlive:  !getEnvBool("CAMO_KEEP_ALIVE", false),
-		MimeTypes:         defaultMimeTypes,
+		MimeTypes:         getMimeTypes(),
 	}
+}
+
+func getMimeTypes() []string {
+	var mimeTypes []string
+	if _, err := os.Stat("mime-types.json"); err == nil {
+		bytes, err := ioutil.ReadFile("mime-types.json")
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
+		if err := json.Unmarshal(bytes, &mimeTypes); err != nil {
+			log.Fatalln(err.Error())
+		}
+		return mimeTypes
+	}
+
+	return defaultMimeTypes
 }
 
 func getEnvStr(key, def string) string {
