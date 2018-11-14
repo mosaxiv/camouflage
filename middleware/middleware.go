@@ -4,19 +4,23 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/mosaxiv/camouflage/config"
 )
 
-func SelfRequest(next http.Handler) http.Handler {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		if strings.Index(r.Header.Get("Via"), r.Header.Get("User-Agent")) != -1 {
-			log.Println("Requesting from self")
-			http.NotFound(w, r)
-			return
+func SelfRequest(c config.Config) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		fn := func(w http.ResponseWriter, r *http.Request) {
+			if strings.Contains(r.Header.Get("Via"), c.HeaderVia) {
+				log.Println("Requesting from self")
+				http.NotFound(w, r)
+				return
+			}
+			next.ServeHTTP(w, r)
 		}
-		next.ServeHTTP(w, r)
-	}
 
-	return http.HandlerFunc(fn)
+		return http.HandlerFunc(fn)
+	}
 }
 
 func DefaultSecurityHeaders(next http.Handler) http.Handler {
