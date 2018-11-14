@@ -5,9 +5,9 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/mosaxiv/camouflage/config"
-	"strings"
 )
 
 type Proxy struct {
@@ -16,13 +16,22 @@ type Proxy struct {
 }
 
 func NewProxy(conf config.Config) Proxy {
-	return Proxy{
-		client: &http.Client{
-			Timeout: conf.Timeout,
-			Transport: &http.Transport{
-				DisableKeepAlives: conf.DisableKeepAlive,
-			},
+	c := &http.Client{
+		Timeout: conf.Timeout,
+		Transport: &http.Transport{
+			DisableKeepAlives: conf.DisableKeepAlive,
 		},
+	}
+
+	c.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		if len(via) >= conf.MaxRedirects {
+			return errors.New("too many redirects")
+		}
+		return nil
+	}
+
+	return Proxy{
+		client: c,
 		config: conf,
 	}
 }
