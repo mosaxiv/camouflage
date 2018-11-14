@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mosaxiv/camouflage/config"
+	"github.com/mosaxiv/camouflage/app/config"
 )
 
 type Proxy struct {
@@ -122,7 +122,7 @@ func (p Proxy) response(w http.ResponseWriter, res *http.Response) error {
 	return nil
 }
 
-func (p Proxy) Proxy(w http.ResponseWriter, r *http.Request, url string) error {
+func (p Proxy) Run(w http.ResponseWriter, r *http.Request, url string) error {
 	res, err := p.request(url, r)
 	if err != nil {
 		return err

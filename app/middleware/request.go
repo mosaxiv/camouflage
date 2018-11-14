@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/mosaxiv/camouflage/config"
+	"github.com/mosaxiv/camouflage/app/config"
 )
 
 func SelfRequest(c config.Config) func(next http.Handler) http.Handler {
