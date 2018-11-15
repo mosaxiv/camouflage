@@ -69,7 +69,7 @@ func (p Proxy) response(w http.ResponseWriter, res *http.Response) error {
 	}
 
 	contentType := res.Header.Get("Content-Type")
-	if contentType != "" {
+	if contentType == "" {
 		return errors.New("no content-type returned")
 	}
 
