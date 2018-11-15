@@ -1,5 +1,9 @@
 # camouflage
 
+Go version of [Camo](https://github.com/atmos/camo) server.  
+
+Camo is a special type of image proxy that proxies non-secure images over SSL/TLS. This prevents mixed content warnings on secure pages.
+
 ## Features
 
 * Max size for proxied images
