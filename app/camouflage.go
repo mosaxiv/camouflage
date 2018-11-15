@@ -25,7 +25,7 @@ type Camouflage struct {
 	p     *Param
 }
 
-func App() {
+func Sever() {
 	conf := config.NewConfig()
 	camo := &Camouflage{
 		conf:  conf,
