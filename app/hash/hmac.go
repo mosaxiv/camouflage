@@ -5,24 +5,22 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"errors"
-	"hash"
 )
 
 type HMAC struct {
-	hmac hash.Hash
+	key []byte
 }
 
 func NewHMAC(key string) HMAC {
-	h := hmac.New(sha1.New, []byte(key))
 	return HMAC{
-		hmac: h,
+		key: []byte(key),
 	}
 }
 
 func (h HMAC) Hash(input string) []byte {
-	h.hmac.Reset()
-	h.hmac.Write([]byte(input))
-	return h.hmac.Sum(nil)
+	ha := hmac.New(sha1.New, h.key)
+	ha.Write([]byte(input))
+	return ha.Sum(nil)
 }
 
 func (h HMAC) DigestCheck(digest, input string) error {
