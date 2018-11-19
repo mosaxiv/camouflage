@@ -47,6 +47,13 @@ func notFound(w http.ResponseWriter) {
 	http.Error(w, "404 page not found", http.StatusNotFound)
 }
 
+func (camo *Camouflage) errorLog(msg string) {
+	if camo.conf.IsErrorLog() {
+		log.SetPrefix("[Error]")
+		log.Println(msg + ": " + camo.p.url)
+	}
+}
+
 func (camo *Camouflage) query(w http.ResponseWriter, r *http.Request) {
 	camo.p = &Param{
 		digest: chi.URLParam(r, "digest"),
@@ -59,6 +66,7 @@ func (camo *Camouflage) query(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := camo.proses(w, r); err != nil {
+		camo.errorLog(err.Error())
 		notFound(w)
 		return
 	}
@@ -67,6 +75,7 @@ func (camo *Camouflage) query(w http.ResponseWriter, r *http.Request) {
 func (camo *Camouflage) param(w http.ResponseWriter, r *http.Request) {
 	url, err := hex.DecodeString(chi.URLParam(r, "url"))
 	if err != nil {
+		camo.errorLog(err.Error())
 		notFound(w)
 		return
 	}
@@ -77,6 +86,7 @@ func (camo *Camouflage) param(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := camo.proses(w, r); err != nil {
+		camo.errorLog(err.Error())
 		notFound(w)
 		return
 	}
@@ -85,6 +95,13 @@ func (camo *Camouflage) param(w http.ResponseWriter, r *http.Request) {
 func (camo *Camouflage) proses(w http.ResponseWriter, r *http.Request) error {
 	if err := camo.hmac.DigestCheck(camo.p.digest, camo.p.url); err != nil {
 		return err
+	}
+
+	if camo.conf.IsDebugLog() {
+		fmt.Println("----------")
+		fmt.Printf("Param:%+v\n", camo.p)
+		fmt.Printf("Header:%+v\n", r.Header)
+		fmt.Println("----------")
 	}
 
 	if err := camo.proxy.Run(w, r, camo.p.url); err != nil {

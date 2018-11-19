@@ -86,6 +86,14 @@ func NewConfig() Config {
 	}
 }
 
+func (c Config) IsDebugLog() bool {
+	return c.LogingEnabled == "debug"
+}
+
+func (c Config) IsErrorLog() bool {
+	return c.LogingEnabled != "disabled"
+}
+
 func getMimeTypes() []string {
 	var mimeTypes []string
 	if _, err := os.Stat("mime-types.json"); err == nil {

@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -114,6 +115,12 @@ func (p Proxy) response(w http.ResponseWriter, res *http.Response) error {
 		h.Set("Content-Encoding", v)
 	}
 
+	if p.config.IsDebugLog() {
+		fmt.Println("-----Response Header-----")
+		fmt.Printf("%+v\n", res.Header)
+		fmt.Println("----------")
+	}
+
 	_, err := io.Copy(w, res.Body)
 	if err != nil {
 		return err
@@ -128,6 +135,12 @@ func (p Proxy) Run(w http.ResponseWriter, r *http.Request, url string) error {
 		return err
 	}
 	defer res.Body.Close()
+
+	if p.config.IsDebugLog() {
+		fmt.Println("-----Request Header-----")
+		fmt.Printf("%+v\n", res.Header)
+		fmt.Println("----------")
+	}
 
 	return p.response(w, res)
 }
